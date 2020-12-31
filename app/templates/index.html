@@ -1,0 +1,55 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-6">
+    <h1>Upload an image</h1>
+    <hr>
+    <form action="/search" method="POST" enctype="multipart/form-data">
+
+      <div class="form-group">
+        <div class="custom-file">
+          <input type="file" class="custom-file-input" name="image">
+          <button type="submit" class="btn btn-primary">Upload</button>
+        </div>
+      </div>
+    </form>
+    <br>
+    <h1>Source Image</h1>
+    <hr>
+    <br>
+    {% if image is defined and image[0] is defined %}
+    <img src="../static/uploads/{{image}}" alt="source Image" width="400" height="400">
+    {% endif%}
+  </div>
+
+  <div class="col-md-4 col-md-offset-1">
+    <h2>Results</h2>
+    <br>
+    <table class="table" id="results-table" >
+     
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Score</th>
+          </tr>
+          
+          {% for item in jsonResult  %}
+          <tr>
+            <td><img src="../static/101_ObjectCategories/{{item.image}}" width="200" , height="200"></td>
+            <td>{{item.score}}</td>
+          </tr>
+          {% endfor %}
+        
+  
+        </thead>
+      
+      
+      <tbody id="results">
+      </tbody>
+    </table>
+  </div>
+</div>
+<br>
+{% endblock %}
