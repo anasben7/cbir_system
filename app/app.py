@@ -1,5 +1,4 @@
 import os
-from flask import Flask, render_template, request, jsonify, redirect
 from Descriptors.colordescriptor import ColorDescriptor
 from Descriptors.texturedescriptor import TextureDescriptor
 from Descriptors.shapedescriptor import ShapeDescriptor
@@ -7,10 +6,13 @@ from searcher import Searcher
 from flask.helpers import flash
 from werkzeug.utils import secure_filename
 import secrets
-import flask
+from flask import Flask, make_response, render_template, request, redirect
 import json
+import csv
+import time
 import numpy as np
 import cv2
+import shutil
 
 # create flask instance
 app = Flask(__name__)
@@ -18,58 +20,72 @@ app.secret_key = "secret_key112211"
 
 
 INDEX = os.path.join(os.path.dirname(__file__), 'index.csv')
-app.config["UPLOAD_DIRECTORY"] = "static/uploads"
 
 
 # main route
 @app.route('/')
-def index():
-    return render_template('index.html')
+def check():
+    if os.path.exists('static/temp') == True :
+        shutil.rmtree('static/temp')
+        shutil.rmtree('static/upload')
+        return redirect('/home')
+    else :
+        return redirect('/home')
 
 
-@app.route('/search', methods=['POST', 'GET'])
+@app.route('/home')
+def home():
+    datasets = os.listdir('static/101_ObjectCategories/')
+    if os.path.exists('static/temp') == True :
+        image_names = os.listdir('static/temp')
+        nearest = sorted(os.listdir('static/temp'))[0]
+        target = os.listdir('static/upload')
+        return render_template("index.html", image_names=sorted(image_names),\
+        target=(target), aw=1, count=len(datasets), nearest=(nearest))
+    else :
+        return render_template("index.html", aw=2, count=len(datasets))
+
+
+
+@app.route('/search', methods=['POST'])
 def search():
+    pictures = request.files['image']
+    file = pictures.read()
+    name = pictures.filename[0:3]
+    cd = ColorDescriptor()
+    td = TextureDescriptor()
+    sd = ShapeDescriptor()
+    npimg = np.frombuffer(file, np.uint8)
+    query = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+    query_gry = cv2.imdecode(npimg, cv2.cv2.IMREAD_GRAYSCALE)
+    
+    features = cd.describe(query)
+    features = np.concatenate([features, td.lbp(query_gry)])
+    features = np.concatenate([features, sd.extractFeatures(query_gry)])
+     
+   # perform the search
+    searcher = Searcher(INDEX)
+    results = searcher.search(features)
 
-    if request.method == "POST":
-        RESULTS_ARRAY = []
-        if request.files["image"]:
-            image = request.files["image"]
 
-            image_dir_name = secrets.token_hex(16)
+    os.makedirs('static/temp')
+    os.makedirs('static/upload')
+    
+    i = 1
+    for (score, resultID) in results:
+        i += 1
+        result = cv2.imread("static/101_ObjectCategories/" + resultID)
+        saveimg = cv2.imwrite("static/temp/" + str(score) + str(i) + ".jpeg", result)
 
-            image.save(os.path.join(
-                app.config["UPLOAD_DIRECTORY"], image.filename))
+    imgstr = time.strftime("%Y%m%d-%H%M%S")
+    cv2.imwrite("static/upload/"+ imgstr +".jpeg", query)
+    return redirect("/home")
 
-            image_read = cv2.imread(
-                'static/uploads/'+image.filename)
-            # return image
-            image_gry = cv2.imread(
-                'static/uploads/'+image.filename,0)
-            # return image
-
-            
-            cd = ColorDescriptor((8,12,3))
-            td = TextureDescriptor()
-            sd = ShapeDescriptor()
-
-             # Now we gonna use our descriptors functions to get the features :
-            features = cd.describe(image_read)
-            features = np.concatenate([features, td.lbp(image_gry)])
-            features = np.concatenate([features, sd.extractFeatures(image_gry)])
-            # perform the search
-            searcher = Searcher(INDEX)
-            results = searcher.search(features)
-            # loop over the results, displaying the score and image name
-            for (score, resultID) in results:
-                RESULTS_ARRAY.append(
-                    {"image": str(resultID), "score": str(score)})
-            # return success
-            results = RESULTS_ARRAY[::]
-            r = json.dumps(results)
-
-            return render_template("index.html", jsonResult=json.loads(r), image=image.filename)
-        else:
-            return render_template('index.html')
+@app.route('/<page_name>')
+def other_page(page_name):
+    response = make_response('The page named %s does not exist.' \
+                             % page_name, 404)
+    return response
 
 if __name__ == "__main__":
     app.run("0.0.0.0", debug=True)

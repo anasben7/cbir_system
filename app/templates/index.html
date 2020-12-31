@@ -1,55 +1,176 @@
-{% extends "_base.html" %}
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>CBIR</title>
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+  <!-- Icons -->
+  <link href="{{url_for('static', filename='assets/js/plugins/nucleo/css/nucleo.css')}}" rel="stylesheet" />
+  <link href="{{url_for('static', filename='assets/js/plugins/@fortawesome/fontawesome-free/css/all.min.css')}}" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link href="{{url_for('static', filename='assets/css/argon-dashboard.css')}}" rel="stylesheet" />
+  <style>.copyleft {display:inline-block; transform: rotate(180deg);}</style>
+</head>
 {% block content %}
-
-<div class="row">
-  <div class="col-md-6">
-    <h1>Upload an image</h1>
-    <hr>
-    <form action="/search" method="POST" enctype="multipart/form-data">
-
-      <div class="form-group">
-        <div class="custom-file">
-          <input type="file" class="custom-file-input" name="image">
-          <button type="submit" class="btn btn-primary">Upload</button>
+<body class="">
+  <div class="main-content">
+    <!-- Navbar -->
+    <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+      <div class="container-fluid">
+        <!-- Brand -->
+        <span class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block">Content Based Image Retrival</span>
+        <div class="media align-items-center">
+          <div class="media-body ml-2 d-none d-lg-block">
+            <a href="#" class="mb-0 text-sm  font-weight-bold text-white">Update Dataset</a>
+          </div>
         </div>
       </div>
-    </form>
-    <br>
-    <h1>Source Image</h1>
-    <hr>
-    <br>
-    {% if image is defined and image[0] is defined %}
-    <img src="../static/uploads/{{image}}" alt="source Image" width="400" height="400">
-    {% endif%}
-  </div>
+    </nav>
+    <!-- End Navbar -->
+    <!-- Header -->
+    <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+      <div class="container-fluid">
+        <div class="header-body">
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid mt--7">
+      <div class="row">
+        <!-- pick picture -->
+        <div class="col-xl-4">
+          <div class="card shadow">
+            <div class="card-header bg-transparent">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h6 class="text-uppercase text-muted ls-1 mb-1"><i class="ni ni-folder-17"></i> Upload</h6>
+                  <h2 class="mb-0">
+                    {% if aw == 2 %}
+                      Pick Your Picture
+                    {% else %}
+                      Your Picture
+                    {% endif %}
+                    </h2>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="box-body">
+                <div class="form-group">
+                  <form action="/search" method="post" enctype="multipart/form-data">
+                  <div class="text-center">
+                    {% if aw == 2 %}
+                      <input type="file" required name="image" accept="image/*" style="margin-bottom: 30px; margin-top: 20px;">
+                      <button type="submit" class="btn btn-primary my-4" value="Submit"><i class="ni ni-send"></i> Search Image</button>
+                      <button type="reset"  class="btn btn-danger my-4" value="Reset"><i class="ni ni-fat-remove"></i> Reset</button>
+                    {% else %}
+                    {% for turget in target %}
+                    <div class="row">
+                      <div class="col-xl-12">
+                        <img class="img-fluid" src="static/upload/{{turget}}">
+                    </div>
+                    </div>
+                    {% endfor %}
+                      <a href="/" class="btn btn-primary my-4"><i class="ni ni-button-power"></i> Search Again</a>
+                    {% endif %}
+                </div>
+                </form>
+                </div>
+              </div>
+            </form>
+            </div>
+          </div><br>
+          <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Dataset Availble</h5>
+                      <span class="h2 font-weight-bold mb-0">Caltech 101</span>
+                    </div>
+                    <div class="col-auto">
+                      <div class="icon icon-shape bg-info text-white rounded-circle shadow">
+                        <i class="fas fa-chart-bar"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
 
-  <div class="col-md-4 col-md-offset-1">
-    <h2>Results</h2>
-    <br>
-    <table class="table" id="results-table" >
-     
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Score</th>
-          </tr>
+        </div>
+
+        <!--end of pick picture -->
+
+        <div class="col-xl-8 mb-5 mb-xl-0">
+          <div class="card bg-gradient-default shadow">
+            <div class="card-header bg-transparent">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h6 class="text-uppercase text-light ls-1 mb-2"><i class="ni ni-tv-2"></i> CBIR</h6>
+                  <h2 class="text-white mb-0">Search by Image</h2>
+                </div>
+              </div>
+            </div>
+            <div class="card-body" {% if aw == 2 %} style="height: 350px" {% endif %}>
+                {% if aw == 2 %}
+                <p class="text-white" >This project implements Image Search Engine through CBIR (content based image retrieval) approach. <br>
+                  CBIR approach pays greater attention to global and local information, such as <b>color</b>, <b>shape</b> and <b>texture.</b></p><br>
+                   <p class="text-white" >The full repository for this project is  <a href="https://github.com/anasben7/cbir_system" target="_blank">here</a></p>
+                  <p class="text-white">There are <b>No</b> result yet,<br><b>Please upload an image first</b> <i class="ni ni-user-run"></i>
+                 <br><br>Made with <i class="fas fa-heart text-danger"></i> By <b>Ben Abdellah Anas, Zafzafi Mohamed, Benali Mounir</b></p>
+                {% else %}
+                <div class="table-responsive">
+                <table class="table align-items-center table-flush text-white">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">No.</th>
+                      <th scope="col">Image</th>
+                      <th scope="col">Feedback</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% set count = namespace(value=1) %}
+                      {% for image_name in image_names %}
+                        <tr>
+                          <td>{{ count.value }}</td>
+                          {% set count.value = count.value + 1 %}
+                          <td><img class="img-responsive" src="static/temp/{{image_name}}"></td>
+                          <td>Feedback Here</td>
+                        </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+        </div>
+        {% endblock content %}
+      </div>
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="row align-items-center justify-content-xl-between">
+          <div class="col-xl-6">
+            <div class="copyright text-center text-xl-left text-muted">
+              &copy; 2021 <a href="http://fstt.ac.ma/ class="font-weight-bold ml-1" target="_blank">FST Tangier</a>
+            </div>
+          </div>
+          <div class="col-xl-6">
+            <ul class="nav nav-footer justify-content-center justify-content-xl-end">
+              <li class="nav-item">
+                <a href="http://fstt.ac.ma/" class="nav-link" target="_blank"><span class="copyleft">&copy;</span> 2021 UAE <b>MBD20-21</b></a>
+              </li>
           
-          {% for item in jsonResult  %}
-          <tr>
-            <td><img src="../static/101_ObjectCategories/{{item.image}}" width="200" , height="200"></td>
-            <td>{{item.score}}</td>
-          </tr>
-          {% endfor %}
-        
-  
-        </thead>
-      
-      
-      <tbody id="results">
-      </tbody>
-    </table>
+              <li class="nav-item">
+                <a href="https://github.com/anasben7/cbir_system" class="nav-link" target="_blank">GitHub Repo</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </footer>
+    </div>
   </div>
-</div>
-<br>
-{% endblock %}
+</body>
+</html>

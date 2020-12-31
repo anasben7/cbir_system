@@ -24,7 +24,7 @@ args = vars(ap.parse_args())
 # Initialize the 3 descriptors
 # For Color descriptor; with 8 bins for the Hue channel, 12 bins for the saturation channel,
 # and 3 bins for the value channel
-cd = ColorDescriptor((8,12,3))
+cd = ColorDescriptor()
 td = TextureDescriptor()
 sd = ShapeDescriptor()
 
