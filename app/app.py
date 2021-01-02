@@ -57,7 +57,7 @@ def search():
     sd = ShapeDescriptor()
     npimg = np.frombuffer(file, np.uint8)
     query = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
-    query_gry = cv2.imdecode(npimg, cv2.cv2.IMREAD_GRAYSCALE)
+    query_gry = cv2.imdecode(npimg, cv2.IMREAD_GRAYSCALE)
     
     features = cd.describe(query)
     features = np.concatenate([features, td.lbp(query_gry)])
