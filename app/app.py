@@ -19,7 +19,9 @@ app = Flask(__name__)
 app.secret_key = "secret_key112211"
 
 
-INDEX = os.path.join(os.path.dirname(__file__), 'index.csv')
+INDEX_COLOR = os.path.join(os.path.dirname(__file__), 'color.csv')
+INDEX_TEXTURE = os.path.join(os.path.dirname(__file__), 'texture.csv')
+INDEX_SHAPE = os.path.join(os.path.dirname(__file__), 'shape.csv')
 
 
 # main route
@@ -40,7 +42,7 @@ def home():
         image_names = os.listdir('static/temp')
         nearest = sorted(os.listdir('static/temp'))[0]
         target = os.listdir('static/upload')
-        return render_template("index.html", image_names=sorted(image_names),\
+        return render_template("index.html", image_names=sorted(image_names,reverse=True),\
         target=(target), aw=1, count=len(datasets), nearest=(nearest))
     else :
         return render_template("index.html", aw=2, count=len(datasets))
@@ -58,14 +60,14 @@ def search():
     npimg = np.frombuffer(file, np.uint8)
     query = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
     query_gry = cv2.imdecode(npimg, cv2.IMREAD_GRAYSCALE)
-    
-    features = cd.describe(query)
-    features = np.concatenate([features, td.lbp(query_gry)])
-    features = np.concatenate([features, sd.extractFeatures(query_gry)])
+    color_features = cd.describe(query)
+    texture_feature = td.lbp(query_gry)
+    shape_feature = sd.extractFeatures(query_gry)
+  
      
    # perform the search
-    searcher = Searcher(INDEX)
-    results = searcher.search(features)
+    searcher = Searcher(INDEX_COLOR,INDEX_TEXTURE,INDEX_SHAPE)
+    results = searcher.search(color_features,texture_feature,shape_feature)
 
 
     os.makedirs('static/temp')
@@ -76,6 +78,7 @@ def search():
         i += 1
         result = cv2.imread("static/101_ObjectCategories/" + resultID)
         saveimg = cv2.imwrite("static/temp/" + str(score) + str(i) + ".jpeg", result)
+    
 
     imgstr = time.strftime("%Y%m%d-%H%M%S")
     cv2.imwrite("static/upload/"+ imgstr +".jpeg", query)

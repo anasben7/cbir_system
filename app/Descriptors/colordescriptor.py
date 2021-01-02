@@ -5,7 +5,9 @@ import imutils
 class ColorDescriptor:
     def __init__(self):
         # store the number of bins for the 3D histogram
-        self.bins = (16, 24, 5)
+        # For Color descriptor; with 8 bins for the Hue channel, 12 bins for the saturation channel,
+        # and 3 bins for the value channel
+        self.bins = (8, 12, 3)
 
     def histogram(self, image, mask):
         # extract a 3D color histogram from the masked region of the
