@@ -10,6 +10,7 @@ CBIR approach pays greater attention to global and local information, such as co
 <p>In this retrieval system, we implemented 3 main image features descriptors:</p>
 <ul>
   <li>color-based</li>
+  <p>hello</p>
   <li>texture-based</li>
   <li>shape-based</li>
 </ul>
