@@ -1,2 +1,0 @@
-# cbir_system
-Test
