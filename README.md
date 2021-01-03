@@ -10,7 +10,10 @@ CBIR approach pays greater attention to global and local information, such as co
 <p>In this retrieval system, we implemented 3 main image features descriptors:</p>
 <ul>
   <li>color-based</li>
-  <p>hello</p>
+      <p>hello</p>
+  <p>HSV histogram</p>
+  <p>To extract the color features from the content of an image, a proper color space(HSV in this case) and an effective color descriptor are determined through color histogram(Local color histogram).
+</p>
   <li>texture-based</li>
   <li>shape-based</li>
 </ul>
