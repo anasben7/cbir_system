@@ -23,9 +23,7 @@
         <!-- Brand -->
         <span class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block">Content Based Image Retrival</span>
         <div class="media align-items-center">
-          <div class="media-body ml-2 d-none d-lg-block">
-            <a href="#" class="mb-0 text-sm  font-weight-bold text-white">Update Dataset</a>
-          </div>
+         
         </div>
       </div>
     </nav>
@@ -48,9 +46,9 @@
                   <h6 class="text-uppercase text-muted ls-1 mb-1"><i class="ni ni-folder-17"></i> Upload</h6>
                   <h2 class="mb-0">
                     {% if aw == 2 %}
-                      Pick Your Picture
+                      Pick an Image
                     {% else %}
-                      Your Picture
+                      Your Image
                     {% endif %}
                     </h2>
                 </div>
@@ -60,16 +58,33 @@
               <div class="box-body">
                 <div class="form-group">
                   <form action="/search" method="post" enctype="multipart/form-data">
+
                   <div class="text-center">
                     {% if aw == 2 %}
+                    <div class="card-body">
+                      <div class="form-check form-check-inline">
+                          <input class="form-check-input"  type="checkbox" id="inlineCheckbox1" name ='checkedDescriptor' value="Color" style="  -webkit-appearance:checkbox;" checked>
+                          <label class="form-check-label" for="inlineCheckbox1">Color</label>
+                      </div>
+                        
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input"  type="checkbox" id="inlineCheckbox2" name='checkedDescriptor' value="Texture" style="  -webkit-appearance:checkbox;" checked>
+                          <label class="form-check-label" for="inlineCheckbox2">Texture</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input"  type="checkbox" id="inlineCheckbox3" name='checkedDescriptor' value="Shape" style="  -webkit-appearance:checkbox;" checked>
+                          <label class="form-check-label" for="inlineCheckbox2">Shape</label>
+                        </div>
+                      
+                    </div>
                       <input type="file" required name="image" accept="image/*" style="margin-bottom: 30px; margin-top: 20px;">
                       <button type="submit" class="btn btn-primary my-4" value="Submit"><i class="ni ni-send"></i> Search Image</button>
                       <button type="reset"  class="btn btn-danger my-4" value="Reset"><i class="ni ni-fat-remove"></i> Reset</button>
                     {% else %}
-                    {% for turget in target %}
+                    {% for img in target %}
                     <div class="row">
                       <div class="col-xl-12">
-                        <img class="img-fluid" src="static/upload/{{turget}}">
+                        <img class="img-fluid" src="static/upload/{{img}}">
                     </div>
                     </div>
                     {% endfor %}
@@ -125,31 +140,39 @@
                   <p class="text-white">There are <b>No</b> result yet,<br><b>Please upload an image first</b> <i class="ni ni-user-run"></i>
                  <br><br>Made with <i class="fas fa-heart text-danger"></i> By <b>Ben Abdellah Anas, Zafzafi Mohamed, Benali Mounir</b></p>
                 {% else %}
+                <form action="/tryagain" method="POST">
                 <div class="table-responsive">
                 <table class="table align-items-center table-flush text-white">
                   <thead class="thead-light">
                     <tr>
-                      <th style="text-align:center;" scope="col">No.</th>
-                      <th style="text-align:center;" scope="col">Image</th>
-                      <th style="text-align:center;" scope="col">Is this accurate?</th>
+                      <th style="text-align:center;" scope="col"><b>No.</b></th>
+                      <th style="text-align:center;" scope="col"><b>Image</b></th>
+                      <th style="text-align:center;" scope="col"><b>Is this accurate?</b></th>
                     </tr>
                   </thead>
                   <tbody>
+                   
                     {% set count = namespace(value=1) %}
                       {% for image_name in image_names %}
                         <tr>
                           <td>{{ count.value }}</td>
                           {% set count.value = count.value + 1 %}
                           <td><img width="280" height="280" src="static/temp/{{image_name}}"></td>
-                          <td style="text-align:center;"> <input type="checkbox" id="checked" name="accurate" value="accurate">
+                          <td style="text-align:center;">  <input class="form-check-input" type="checkbox" name='goodimg' value="{{image_name}}" style="  -webkit-appearance:checkbox;">
                           </td>
                         </tr>
                     {% endfor %}
+                
                   </tbody>
                 </table>
                 </div>
                 <br>
-                <center><a href="#" class="btn btn-primary my-4 shadow"> <i class="fas fa-crosshairs"></i></i> Try Again</a></center>
+               
+                  <center><button class="btn btn-primary my-4 shadow" type="submit"><i class="fas fa-crosshairs"></i> Try Again</button></center>
+              </form>
+                
+
+               
                 {% endif %}
                 
               </div>

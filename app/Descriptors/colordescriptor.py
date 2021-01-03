@@ -1,6 +1,5 @@
 import numpy as np
 import cv2
-import imutils
 
 class ColorDescriptor:
     def __init__(self):
@@ -13,13 +12,10 @@ class ColorDescriptor:
         # extract a 3D color histogram from the masked region of the
         # image, using the supplied number of bins per channel
         hist = cv2.calcHist([image], [0, 1, 2], mask, self.bins,[0, 180, 0, 256, 0, 256])
-        # normalize the histogram if we are using OpenCV 2.4
         # normalization
-        hist = hist / np.sum(hist)
-        # flatten
-        hist = hist.flatten()
-
+        hist = cv2.normalize(hist,hist).flatten()
         return hist
+
 
     def describe(self, image):
         # convert the image to the HSV color space and initialize
